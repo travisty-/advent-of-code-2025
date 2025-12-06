@@ -1,0 +1,48 @@
+{
+    "name": "Advent of Code (Rust)",
+    "image": "mcr.microsoft.com/devcontainers/rust",
+    "runArgs": [
+        "--name=advent-of-code-rust",
+        "--env-file=.devcontainer/devcontainer.env"
+    ],
+
+    // Configure tool-specific properties.
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "editorConfig.editorConfig",
+                "rust-lang.rust-analyzer",
+                "vadimcn.vscode-lldb"
+            ],
+            "settings": {
+                "editor.inlayHints.enabled": "offUnlessPressed"
+            }
+        }
+    },
+
+    // Configure container-specific features.
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils": {}
+    },
+
+    // Use 'mounts' to persist data in a bind mount or volume.
+    "mounts": [
+        {
+            "source": "devcontainer-cargo-cache-${devcontainerId}",
+            "target": "/usr/local/cargo",
+            "type": "volume"
+        }
+    ],
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    "forwardPorts": [],
+
+    // Use 'postCreateCommand' to run commands after the container is created.
+    "postCreateCommand": {
+        "cargo": "cargo install aoc-cli",
+        "rustc": "rustc --version"
+    },
+
+    // Uncomment to connect as root instead.
+    "remoteUser": "root"
+}
