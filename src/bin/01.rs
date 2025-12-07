@@ -1,3 +1,5 @@
+use num::Integer;
+
 advent_of_code::solution!(1);
 
 fn parse_rotations(input: &str) -> impl Iterator<Item = i32> + '_ {
@@ -23,8 +25,22 @@ pub fn part_one(input: &str) -> Option<u64> {
     Some(count)
 }
 
-pub fn part_two(_input: &str) -> Option<u64> {
-    None
+pub fn part_two(input: &str) -> Option<u64> {
+    let mut dial = 50;
+    let mut count = 0;
+
+    for rotation in parse_rotations(input) {
+        let position = dial + rotation;
+
+        count += match rotation.signum() {
+            -1 => Integer::div_ceil(&dial, &100) - Integer::div_ceil(&position, &100),
+            _ => Integer::div_floor(&position, &100) - Integer::div_floor(&dial, &100),
+        };
+
+        dial = position.rem_euclid(100);
+    }
+
+    Some(count as u64)
 }
 
 #[cfg(test)]
@@ -40,6 +56,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(6));
     }
 }
