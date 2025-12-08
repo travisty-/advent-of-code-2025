@@ -1,4 +1,10 @@
+use std::sync::LazyLock;
+use fancy_regex::Regex;
+
 advent_of_code::solution!(2);
+
+static PART_ONE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^(\d+)\1$").unwrap());
+static PART_TWO: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"^(\d+)\1+$").unwrap());
 
 fn parse_ranges(input: &str) -> impl Iterator<Item = (u64, u64)> + '_ {
     input.trim().split(',').map(|range| {
@@ -9,24 +15,19 @@ fn parse_ranges(input: &str) -> impl Iterator<Item = (u64, u64)> + '_ {
     })
 }
 
-pub fn part_one(input: &str) -> Option<u64> {
-    let mut sum = 0;
-
-    for (start, end) in parse_ranges(input) {
-        for id in start..=end {
-            let item = id.to_string();
-            let (left, right) = item.split_at(item.len() / 2);
-            if left == right {
-                sum += id;
-            }
-        }
-    }
-
-    Some(sum)
+fn sum_invalid_ids(input: &str, pattern: &Regex) -> u64 {
+    parse_ranges(input)
+        .flat_map(|(start, end)| start..=end)
+        .filter(|id| pattern.is_match(&id.to_string()).unwrap())
+        .sum()
 }
 
-pub fn part_two(_input: &str) -> Option<u64> {
-    None
+pub fn part_one(input: &str) -> Option<u64> {
+    Some(sum_invalid_ids(input, &PART_ONE))
+}
+
+pub fn part_two(input: &str) -> Option<u64> {
+    Some(sum_invalid_ids(input, &PART_TWO))
 }
 
 #[cfg(test)]
@@ -42,6 +43,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(4174379265));
     }
 }
